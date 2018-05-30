@@ -2,18 +2,18 @@ language: bash
 before_script:
 - sudo pip install awscli
 - mkdir output
-- mkdir output/resume
 script:
-- docker run -v ${PWD}:/resume there4/markdown-resume md2resume html cv.md ./output/resume
+- docker run -v ${PWD}:/resume there4/markdown-resume md2resume html index.md ./output
+- ln -s index.md guyhf.md
+- docker run -v ${PWD}:/resume there4/markdown-resume md2pdf guyhf.md ./output
 deploy:
   on:
     branch: master
   provider: s3
-  region: us-west-1
+  region: us-west-2
   access_key_id: "$AWS_ACCESS_KEY_ID"
   secret_access_key: "$AWS_SECRET_ACCESS_KEY"
-  bucket: blog.guyhf.com
-  prefix: resume
+  bucket: resume.guyhf.com
   acl: public_read
   skip_cleanup: true
   local_dir: output
