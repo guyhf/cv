@@ -11,7 +11,8 @@ deploy:
   region: us-west-1
   access_key_id: "$AWS_ACCESS_KEY_ID"
   secret_access_key: "$AWS_SECRET_ACCESS_KEY"
-  bucket: blog.guyhf.com/resume
+  bucket: blog.guyhf.com
+  prefix: resume
   acl: public_read
   skip_cleanup: true
   local_dir: output
