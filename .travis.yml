@@ -1,8 +1,8 @@
 language: bash
 before_script:
   - sudo pip install awscli
-script:
   - mkdir output
+script:
   - docker run -v ${PWD}:/resume there4/markdown-resume md2resume html cv.md ./output
 deploy:
   on:
