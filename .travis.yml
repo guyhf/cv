@@ -1,0 +1,24 @@
+language: bash
+before_script:
+  - sudo pip install awscli
+script:
+  - mkdir output
+  - docker run -v ${PWD}:/resume there4/markdown-resume md2resume html cv.md ./output
+deploy:
+  on:
+    branch: master
+  provider: s3
+  region: "us-west-1"
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  bucket: blog.guyhf.com/resume
+  acl: public_read
+  skip_cleanup: true
+  # Path to a directory containing your built site.
+  local_dir: output
+  # Set the Cache-Control header.
+  cache_control: "max-age=21600"
+env:
+  global:
+  - secure: DAmAQTnwyKia8k0E/YGKG9AkovNYLRxtj6hXdg2Es+ms8b/OKhUUJxHBwnNFz06E5GJ7E//i7pb/j//CVNyLrOYVnLFEDWlS1LQixnDkBtvopgr/Lu14KtsxzMWOFpTvcrNk5AqSSslcAfquUJtUD6bRzbAtc/C0UJZ9neRrdCbR0yMmM288HRQV4AmDKe3lMfWRa+YNpVXFOFgsZ8IfVp3gflVI232DH+G3Qe7hxKWB2Ti3CCXDhYrOB7vEZd6xzzeOV7LOPzwEHmQRPH4OuGOIlWTxEwkHXQItO1rUlqr3pG8axkDrg0/bnQs9Q66M2sPXTOpekSaDJO6IMzJ2H8WbFx+0y+tBtJJtW7CZiZ9maFCCJnCd3kYd1G7o8qcT3LgsBawmzj0W+Af9K7R3NI3ulagK8Lt0VwQN6UW5uZ1lhbGBrag+dKBjYazyu3nWD3+ZKWmz0U7IoMAa+ThiG7+jYWW21W/2ZMNdYdDWIKHOZw5YsOKK0IgZH87T8dFmouqdPG9tMsGT92GwChgjSXcH0tyVR3BOq8BqlApeAKOcOtY6jvk4wW/Os6PGUsTtAFp0HPxxqZ56L0ZI7QA7mOvsdpgflMXlxXoCzK2bwANxIw1yJmuTPvJ45vuHuHmkElVwQ9k5ba8emdRzsP2EUGlLCNNrMGVuZJE66MwF764=
+  - secure: alWFMnAh5r4ZzSAmWIqkfV8GcnheensQD5PUhjkIm3viJ+rx87wb6HbHlvcDVQApoaD4YSlebfiyRoBJt9XVKAAi6RNt+EA9mEYlZ5TZaUfB/g7WKjn5VgQU8UVAM2o1tO002L/YD4G0f8rQXtAkTAoNpksLSg9eDiXn42ctSoGWbkcEc1yW0o7MyyKge6TIRRFXBP6empLyF/dzTcjP26RF/Ffn0+nuaPchx3dKrPbl0RX8EC2DFQyBIz30j5zYC1t2FD91JaOKCXgl9yaez2SUQ8+xD4q5yhqZCKKssVPoQdii4AWeK9Wzf2lyQL4SJeJGJPc2AXRqbel5hl01kTFoZVYnfkFc6py3ECwLZcbU0FMU0BR33aSqdp9CttkBmgciC3l1osDoPDDTnZQbtm7YROjSnJ65tphA9ELrvsldY1+XDifmXOC/E5MVz2GqmMMhfuirG8YC9i5Dtnl6KwUJVJ+HzpLE/ednjpDxoUTF+hTmTobu+kFM0ixTyHz0xB19r3WYh7cqzKnGfcOxhuffi3B11mkArY6LVmLijAsipUFA9jIwBJ0KLgpQZoSHurO9qFDztMpOs27xbFlcAE3UgPi/V7eh8UCQ9WD/rjg9HaO5t0JgTzOrxzUuXWF2F3SMxohzF1gfaa+1kksZkJbnvc15rFix/cQdbMV3qrM=
