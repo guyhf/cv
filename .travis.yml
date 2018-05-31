@@ -1,11 +1,13 @@
 language: bash
 before_script:
+- sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended
 - sudo pip install awscli
 - mkdir output
+- ln -s resume.tex index.tex
+- ln -s resume.tex guyhf.tex
 script:
-- docker run -v ${PWD}:/resume there4/markdown-resume md2resume html index.md ./output
-- ln -s index.md guyhf.md
-- docker run -v ${PWD}:/resume there4/markdown-resume md2pdf guyhf.md ./output
+- perl ltoh.pl index.tex
+- pdflatex --output-directory=output guyhf.tex
 deploy:
   on:
     branch: master
