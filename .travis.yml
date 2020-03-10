@@ -20,6 +20,18 @@ deploy:
   skip_cleanup: true
   local_dir: output
   cache_control: max-age=21600
+deploy:
+  on:
+    branch: master
+  provider: s3
+  region: us-west-2
+  access_key_id: "$AWS_ACCESS_KEY_ID"
+  secret_access_key: "$AWS_SECRET_ACCESS_KEY"
+  bucket: www.guyhf.com
+  acl: public_read
+  skip_cleanup: true
+  local_dir: output
+  cache_control: max-age=21600
 env:
   global:
   - secure: U1D4B7yWxW6E/FaSX7OScZPN1YP2FRXGSpizG2Ftt5nEFLX0gxccqQvAu04HatTc3miQJDtEnB6xJXcwzBMby5JyWXGHgr7kVPZC88ANC6ZxGwYFfCOhhq9KFkn4UI0ppWpzGkGydeJaItTou5asIqOMuxIm/kaHr63iQDAJ4wQ4trnRhQIb6VhqclYlBJsDnlYxlJyem8EjwsmzDeOideICWnmYg9Irlbu+oX/SNe58EVY86SPZHiVtxzAPWxddqbhOZgPFnhGRU4XFYzZN5d0XGuj8FFwbGINJDtYcUIil539wzcWFjoQi+B0N1jveI2bSj+K9z+6s0oNPiz0Kq4/x7pI6cpRDJNqGUmic8E+bB3RBNIpHKY7jXL8CZi0kxhoBmc0IPzH4V7eP7M3ZenqUcXikuF4kyYJOYFUntxMFyBRGRLjLoXtGcN45hvD05oyJ3X8i1c7ekhxQRjSYIE6MRQftbnIrFzK3NL0UgOPjUwme0ysH7KvhljOy6KFTA37+ys5ybMzAeQzFAD3FQPlJ0fn0kROtfKfM9B6DW4PgjlkGMlBP5Dmm5ol1ZrZXcyez1Kg48wKdrcxsz4cMyOsDJbNfzyuFbV4CZIJvpjZwJIvFmLP67ots9ElCmR+l20OQsIoJ5gKHPY4GBnXxdkHHoSXEzBFuKGH+4a9IANw=
