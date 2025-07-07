@@ -1,0 +1,65 @@
+name: CI & Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Check out the repo
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Install system packages (LaTeX, dvipng, etc.)
+      - name: Install TeX dependencies
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-fonts-recommended \
+            texlive-latex-extra \
+            texlive-fonts-extra \
+            dvipng \
+            texlive-latex-recommended
+
+      # 3. Install AWS CLI
+      - name: Install AWS CLI
+        run: pip install awscli
+
+      # 4. Prepare build directory and symlinks
+      - name: Prepare files
+        run: |
+          mkdir output
+          ln -s resume.tex index.tex
+          ln -s resume.tex guyhf.tex
+
+      # 5. Run your conversion & build steps
+      - name: Convert LaTeX to HTML (ltoh)
+        run: perl ltoh.pl index.tex
+
+      - name: Compile PDF
+        run: pdflatex --output-directory=output guyhf.tex
+
+      # 6. Configure AWS credentials for deployment
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      # 7. Deploy output/ to your two S3 buckets
+      - name: Deploy to resume.guyhf.com
+        run: |
+          aws s3 sync output/ s3://resume.guyhf.com \
+            --acl public-read \
+            --cache-control max-age=21600
+
+      - name: Deploy to www.guyhf.com
+        run: |
+          aws s3 sync output/ s3://www.guyhf.com \
+            --acl public-read \
+            --cache-control max-age=21600
+
