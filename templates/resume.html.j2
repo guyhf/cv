@@ -47,11 +47,20 @@ section > .section-body > :first-child { margin-top: 0; }
 .cv-row .r { text-align: right; white-space: nowrap; }
 .cv-entry p { margin: 0.25rem 0 0; }
 ul.cv-list { margin: 0.3rem 0; padding-left: 1.1rem; }
+.section-body { overflow-wrap: break-word; }
 
-/* Stack the columns on narrow screens. */
+/* Mobile: stack the heading + content columns, and stack each entry's
+   employer / title / location / dates instead of pushing them to opposite
+   edges (which overflows on a narrow screen). */
 @media (max-width: 700px) {
-  section { grid-template-columns: 1fr; column-gap: 0; }
+  body { max-width: 100%; padding-left: 1rem; padding-right: 1rem; }
+  /* Drop the two-column grid entirely and stack heading + content as plain
+     blocks, so paragraphs wrap to the viewport instead of a fixed track width. */
+  section { display: block; }
   section > h2 { margin-bottom: 0.4rem; }
+  .cv-row { flex-direction: column; gap: 0; }
+  .cv-row .r { text-align: left; white-space: normal; }
+  header h1:first-child { font-size: 1.5rem; }
 }
 </style>
 </head>
