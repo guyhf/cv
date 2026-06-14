@@ -38,9 +38,6 @@ resource "aws_iam_policy" "deploy" {
           "s3:GetObject",
           "s3:PutObject",
           "s3:DeleteObject",
-          # Required only while CI deploys with `--acl public-read`
-          # (pre-Phase 4). Remove once the buckets are private behind CloudFront.
-          "s3:PutObjectAcl",
         ]
         Resource = [for d in var.domains : "arn:aws:s3:::${d}/*"]
       },

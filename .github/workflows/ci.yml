@@ -48,29 +48,22 @@ jobs:
 
       # Deploy only the web assets (index.html + guyhf.pdf); never the
       # intermediate .tex/.aux/.log.
+      # Buckets are private behind CloudFront (OAC); no object ACLs. After each
+      # sync, invalidate the two cached objects so changes go live immediately.
       - name: Deploy to www.guyhf.com
         run: |
           aws s3 sync output/ s3://www.guyhf.com \
-            --acl public-read \
             --cache-control max-age=21600 \
             --exclude "*" --include "index.html" --include "guyhf.pdf"
+          aws cloudfront create-invalidation \
+            --distribution-id E3GWSG61YLV4LV \
+            --paths "/index.html" "/guyhf.pdf"
 
       - name: Deploy to resume.guyhf.com
         run: |
           aws s3 sync output/ s3://resume.guyhf.com \
-            --acl public-read \
             --cache-control max-age=21600 \
             --exclude "*" --include "index.html" --include "guyhf.pdf"
-
-      # ------------------------------------------------------------------ #
-      # PHASE 4 (HTTPS) — apply together with the Terraform in infra/:
-      #   1. Drop "--acl public-read" from both syncs above (buckets become
-      #      private; CloudFront reads them via OAC).
-      #   2. Append a CloudFront invalidation to each deploy, e.g.:
-      #        aws cloudfront create-invalidation \
-      #          --distribution-id ${{ secrets.CLOUDFRONT_WWW_ID }} \
-      #          --paths "/index.html" "/guyhf.pdf"
-      #      using new repo secrets CLOUDFRONT_WWW_ID / CLOUDFRONT_RESUME_ID.
-      # These two changes must land in the SAME commit that makes the buckets
-      # private, or the deploy/site will break.
-      # ------------------------------------------------------------------ #
+          aws cloudfront create-invalidation \
+            --distribution-id E1CHTNI2R01HU2 \
+            --paths "/index.html" "/guyhf.pdf"
