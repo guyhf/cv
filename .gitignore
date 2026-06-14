@@ -1,3 +1,20 @@
+# Build output
 output/
-guyhf.tex
-index.tex
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Local LaTeX / build artifacts
+*.aux
+*.log
+*.pdf
+
+# Stray local virtualenv (legacy, safe to delete locally)
+cv/
+
+# Terraform (keep .terraform.lock.hcl tracked)
+infra/.terraform/
+*.tfstate
+*.tfstate.*

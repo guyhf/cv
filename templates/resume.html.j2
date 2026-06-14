@@ -1,0 +1,161 @@
+{# Rendered from resume.yaml by build.py. Do not edit output/index.html. #}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ name }}</title>
+<style>
+{{ font_face_css | safe }}
+{{ css | safe }}
+
+/* Résumé-specific layout on top of latex.css */
+:root {
+  --head-col: 8em;    /* left column: section headings */
+  --body-col: 80ch;   /* right column: content (unchanged text width) */
+  --col-gap: 2rem;
+}
+body { max-width: calc(var(--head-col) + var(--col-gap) + var(--body-col)); }
+
+header { text-align: center; margin-bottom: 1.5rem; }
+header h1 { font-variant: small-caps; margin-bottom: 0.25rem; }
+header .pdf-link { font-size: 0.85rem; }
+
+/* Two-column sections: heading on the left, content on the right. */
+section {
+  display: grid;
+  grid-template-columns: var(--head-col) minmax(0, var(--body-col));
+  column-gap: var(--col-gap);
+  border-top: 1px solid currentColor;
+  padding-top: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+section > h2 {
+  grid-column: 1;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: bold;
+  font-variant: small-caps;
+  border-bottom: none;
+  padding: 0;
+}
+section > .section-body { grid-column: 2; }
+section > .section-body > :first-child { margin-top: 0; }
+
+.cv-entry { margin-bottom: 0.9rem; }
+.cv-row { display: flex; justify-content: space-between; gap: 1.5rem; }
+.cv-row .r { text-align: right; white-space: nowrap; }
+.cv-entry p { margin: 0.25rem 0 0; }
+ul.cv-list { margin: 0.3rem 0; padding-left: 1.1rem; }
+
+/* Stack the columns on narrow screens. */
+@media (max-width: 700px) {
+  section { grid-template-columns: 1fr; column-gap: 0; }
+  section > h2 { margin-bottom: 0.4rem; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>{{ name }}</h1>
+  {% if email or website %}
+  <p class="contact">
+    {% if email %}<a href="mailto:{{ email }}">{{ email }}</a>{% endif %}
+    {% if email and website %} &middot; {% endif %}
+    {% if website %}<a href="{{ website }}">{{ website }}</a>{% endif %}
+  </p>
+  {% endif %}
+  <p class="pdf-link"><a href="guyhf.pdf">PDF version</a></p>
+</header>
+
+<section>
+  <h2>Interests</h2>
+  <div class="section-body">
+    <p>{{ interests | rich }}</p>
+  </div>
+</section>
+
+<section>
+  <h2>Professional Experience</h2>
+  <div class="section-body">
+    {% for job in experience %}
+    <div class="cv-entry">
+      <div class="cv-row">
+        <span class="l"><strong>{{ job.employer | rich }}</strong>{% if job.get('employer_note') %} <small>{{ job.employer_note | rich }}</small>{% endif %}</span>
+        <span class="r">{{ job.title | rich }}</span>
+      </div>
+      {% if job.get('employer_subtitle') %}<div class="cv-row"><span class="l"><small>{{ job.employer_subtitle | rich }}</small></span></div>{% endif %}
+      <div class="cv-row">
+        <span class="l"><em>{{ job.location | rich }}</em></span>
+        <span class="r"><strong>{{ job.dates | rich }}</strong></span>
+      </div>
+      <p>{{ job.body | rich }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <h2>Patents</h2>
+  <div class="section-body">
+    {% for patent in patents %}
+    <p>{{ patent | rich }}</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <h2>Education</h2>
+  <div class="section-body">
+    {% for school in education %}
+    <div class="cv-entry">
+      <div class="cv-row">
+        <span class="l"><strong>{{ school.institution | rich }}</strong>, <em>{{ school.location | rich }}</em></span>
+        <span class="r"><strong>{{ school.dates | rich }}</strong></span>
+      </div>
+      <ul class="cv-list">
+        {% for item in school['items'] %}<li>{{ item | rich }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <h2>Publications</h2>
+  <div class="section-body">
+    {% for pub in publications %}
+    <p>{{ pub | rich }}</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section>
+  <h2>Honors and Awards</h2>
+  <div class="section-body">
+    <ul class="cv-list">
+      {% for honor in honors %}<li>{{ honor | rich }}</li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Technical Skills</h2>
+  <div class="section-body">
+    <ul class="cv-list">
+      {% for skill in technical_skills %}<li>{{ skill | rich }}</li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Interests and Skills</h2>
+  <div class="section-body">
+    <ul class="cv-list">
+      {% for activity in activities %}<li>{{ activity | rich }}</li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+</body>
+</html>

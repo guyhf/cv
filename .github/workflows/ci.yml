@@ -9,57 +9,68 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      # 1. Check out the repo
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2. Install system packages (LaTeX, dvipng, etc.)
       - name: Install TeX dependencies
         run: |
           sudo apt-get -qq update
           sudo apt-get install -y --no-install-recommends \
-            texlive-fonts-recommended \
+            texlive-latex-recommended \
             texlive-latex-extra \
-            texlive-fonts-extra \
-            dvipng \
-            texlive-latex-recommended
+            texlive-fonts-recommended \
+            texlive-fonts-extra
 
-      # 3. Install AWS CLI
-      - name: Install AWS CLI
-        run: pip install awscli
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-      # 4. Prepare build directory and symlinks
-      - name: Prepare files
-        run: |
-          mkdir output
-          ln -s resume.tex index.tex
-          ln -s resume.tex guyhf.tex
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
 
-      # 5. Run your conversion & build steps
-      - name: Convert LaTeX to HTML (ltoh)
-        run: perl ltoh.pl index.tex
+      - name: Build site (HTML + LaTeX)
+        run: python build.py
 
       - name: Compile PDF
-        run: pdflatex --output-directory=output guyhf.tex
+        # res.sty is in the repo root, so run from there.
+        run: |
+          pdflatex -interaction=nonstopmode -halt-on-error \
+            -output-directory=output output/resume.tex
+          mv output/resume.pdf output/guyhf.pdf
 
-      # 6. Configure AWS credentials for deployment
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
 
-      # 7. Deploy output/ to your two S3 buckets
-      - name: Deploy to resume.guyhf.com
-        run: |
-          aws s3 sync output/ s3://resume.guyhf.com \
-            --acl public-read \
-            --cache-control max-age=21600
-
+      # Deploy only the web assets (index.html + guyhf.pdf); never the
+      # intermediate .tex/.aux/.log.
       - name: Deploy to www.guyhf.com
         run: |
           aws s3 sync output/ s3://www.guyhf.com \
             --acl public-read \
-            --cache-control max-age=21600
+            --cache-control max-age=21600 \
+            --exclude "*" --include "index.html" --include "guyhf.pdf"
 
+      - name: Deploy to resume.guyhf.com
+        run: |
+          aws s3 sync output/ s3://resume.guyhf.com \
+            --acl public-read \
+            --cache-control max-age=21600 \
+            --exclude "*" --include "index.html" --include "guyhf.pdf"
+
+      # ------------------------------------------------------------------ #
+      # PHASE 4 (HTTPS) — apply together with the Terraform in infra/:
+      #   1. Drop "--acl public-read" from both syncs above (buckets become
+      #      private; CloudFront reads them via OAC).
+      #   2. Append a CloudFront invalidation to each deploy, e.g.:
+      #        aws cloudfront create-invalidation \
+      #          --distribution-id ${{ secrets.CLOUDFRONT_WWW_ID }} \
+      #          --paths "/index.html" "/guyhf.pdf"
+      #      using new repo secrets CLOUDFRONT_WWW_ID / CLOUDFRONT_RESUME_ID.
+      # These two changes must land in the SAME commit that makes the buckets
+      # private, or the deploy/site will break.
+      # ------------------------------------------------------------------ #

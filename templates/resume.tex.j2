@@ -1,0 +1,122 @@
+((# Rendered from resume.yaml by build.py. Do not edit output/resume.tex. #))
+\documentstyle[margin,line,hyperref]{res}
+
+\raggedright
+
+\newenvironment{listitems}{
+  \begin{list}{$\bullet$}{%
+      \setlength{\itemsep}{0in}
+      \setlength{\parsep}{0in} \setlength{\parskip}{0in}
+      \setlength{\topsep}{0in} \setlength{\partopsep}{0in}
+      \setlength{\leftmargin}{0.2in}}}{\end{list}}
+
+\hypersetup{pdfpagemode=FullScreen, colorlinks=false}
+
+\setlength{\oddsidemargin}{-0.5in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{6.0in}
+\setlength{\headheight}{0.0in}
+\setlength{\topmargin}{-0.1in}
+\setlength{\textheight}{9.75in}
+
+\renewcommand{\namefont}{\LARGE\sc\bf}
+
+\begin{document}
+\name{\sc{\bf{((( name | tex )))}}}
+((* if email or website *))
+\address{
+  ((* if email *))\href{mailto:((( email )))}{((( email | tex )))}((* endif *))
+  ((* if website *))\\ \small{\href{((( website )))}{((( website | tex )))}}((* endif *))
+}
+((* endif *))
+
+\begin{resume}
+
+\section{\sc{Interests}}
+((( interests | tex )))
+
+\section{\sc{Professional Experience}}
+\begin{format}
+  \employer{l}\location{r}\\
+  \title{l}\dates{r}\\
+  \body\\
+\end{format}
+
+((* for job in experience *))
+\employer{\textbf{((( job.employer | tex )))}((* if job.get('employer_note') *)) \small{((( job.employer_note | tex )))}((* endif *))((* if job.get('employer_subtitle') *))\\
+\small{((( job.employer_subtitle | tex )))}((* endif *))}
+\title{\small{\sc{((( job.title | tex )))}}}
+\location{\textit{((( job.location | tex )))}}
+\dates{\textbf{((( job.dates | tex )))}}
+\begin{position}
+((( job.body | tex )))
+\end{position}
+((* if not loop.last *))
+
+\vspace{-0.5em}
+((* endif *))
+((* endfor *))
+
+\section{\sc{Patents}}
+((* for patent in patents *))
+((( patent | tex )))
+((* if not loop.last *))
+
+((* endif *))
+((* endfor *))
+
+\section{\sc{Education}}
+\begin{format}
+  \employer{l}\location{r}\\
+  \body\\
+\end{format}
+
+((* for school in education *))
+\employer{\textbf{((( school.institution | tex )))}, \textit{((( school.location | tex )))}}
+\location{\hspace{0.25in}\textbf{((( school.dates | tex )))}}
+\title{}
+\dates{}
+\begin{position}
+\vspace{1.5em}
+\begin{listitems}
+((* for item in school['items'] *))
+\item ((( item | tex )))
+((* endfor *))
+\end{listitems}
+\end{position}
+
+((* endfor *))
+
+\section{\sc{Publications}}
+\raggedright
+
+((* for pub in publications *))
+((( pub | tex )))
+((* if not loop.last *))
+
+((* endif *))
+((* endfor *))
+
+\section{\sc{Honors and Awards}}
+\begin{listitems}
+((* for honor in honors *))
+\item ((( honor | tex )))
+((* endfor *))
+\end{listitems}
+
+\section{\sc{Technical Skills}}
+\begin{listitems}
+((* for skill in technical_skills *))
+\item ((( skill | tex )))
+((* endfor *))
+\end{listitems}
+
+\section{\sc{Interests and Skills}}
+\begin{listitems}
+((* for activity in activities *))
+\item ((( activity | tex )))
+((* endfor *))
+\end{listitems}
+
+\end{resume}
+\end{document}
