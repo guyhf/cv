@@ -1,18 +1,12 @@
-# Remote state in S3 with native lockfile (Terraform >= 1.10, no DynamoDB needed).
+# Remote state in the existing shared state bucket, isolated under its own key.
+# Native S3 lockfile (Terraform >= 1.10, no DynamoDB needed).
 #
-# Bootstrap once before `terraform init` (the state bucket cannot manage itself):
-#
-#   aws s3api create-bucket --bucket guyhf-tfstate --region us-west-2 \
-#     --create-bucket-configuration LocationConstraint=us-west-2
-#   aws s3api put-bucket-versioning --bucket guyhf-tfstate \
-#     --versioning-configuration Status=Enabled
-#
-# Then change the bucket name below if you chose a different one.
+# If that bucket is not in us-west-2, set `region` to the bucket's region.
 terraform {
   backend "s3" {
-    bucket       = "guyhf-tfstate"
+    bucket       = "guyhf-terraform-state"
     key          = "cv/terraform.tfstate"
-    region       = "us-west-2"
+    region       = "us-east-1" # region of the state bucket (site buckets are us-west-2)
     encrypt      = true
     use_lockfile = true
   }

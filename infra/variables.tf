@@ -21,3 +21,9 @@ variable "price_class" {
   type        = string
   default     = "PriceClass_100"
 }
+
+variable "deploy_user_name" {
+  description = "Name of the IAM user used by CI to deploy the site."
+  type        = string
+  default     = "guyhf-deploy"
+}

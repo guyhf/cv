@@ -9,17 +9,36 @@ DNS is at **Hover**, not Route 53, so certificate validation and the final
 CNAME repoint are manual. The order below keeps the live site up the whole time:
 the buckets are not locked down until DNS already points at CloudFront.
 
-## One-time bootstrap
+## Initialize
 
-The state bucket can't manage itself:
+State lives in the existing shared bucket `s3://guyhf-terraform-state` under the
+key `cv/terraform.tfstate` (see `backend.tf`), so there's nothing to bootstrap —
+just initialize:
 
 ```sh
-aws s3api create-bucket --bucket guyhf-tfstate --region us-west-2 \
-  --create-bucket-configuration LocationConstraint=us-west-2
-aws s3api put-bucket-versioning --bucket guyhf-tfstate \
-  --versioning-configuration Status=Enabled
 terraform -chdir=infra init
 ```
+
+## Deploy user (fixes the CI auth)
+
+Creates the dedicated `guyhf-deploy` IAM user + least-privilege policy + access
+key. Independent of the HTTPS resources, so apply it on its own:
+
+```sh
+terraform -chdir=infra apply \
+  -target=aws_iam_user.deploy \
+  -target=aws_iam_policy.deploy \
+  -target=aws_iam_user_policy_attachment.deploy \
+  -target=aws_iam_access_key.deploy
+
+terraform -chdir=infra output       deploy_access_key_id        # -> AWS_ACCESS_KEY_ID
+terraform -chdir=infra output -raw  deploy_secret_access_key    # -> AWS_SECRET_ACCESS_KEY
+```
+
+Put those two values into the repo's GitHub Actions secrets
+(**Settings → Secrets and variables → Actions**), then re-run the failed
+workflow. The policy already covers the Phase 4 CloudFront invalidation, so no
+IAM change is needed later. To rotate the key: `terraform apply -replace=aws_iam_access_key.deploy`.
 
 ## Step 1 — Certificate
 
